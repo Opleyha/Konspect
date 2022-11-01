@@ -1,0 +1,74 @@
+Конспект
+pragma solidity >0.7.0;
+
+contract Cont
+{
+    struct Test{
+        address owner;
+        string info;
+        uint sq;
+        bool presentStatus;
+        bool saleStatus;
+    }
+
+   struct Present{
+        uint test_id;
+        address adr_from;
+        address adr_to;
+        bool status;
+    }
+
+    struct Sale{
+        uint estate_id;
+        address owner;
+        uint price;
+        address payable[] customers;
+        uint [] prices;
+        bool status;
+    }
+    mapping(uint => Sale) public sales;
+    uint s_length = 0;
+
+    address admin = msg.sender; 
+
+    mapping (uint => Test) public Tests;
+    uint e_l = 0;
+
+    mapping (uint => Present) public presents;
+    uint p_lenght = 0;
+
+    modifier isOwner(uint _eastate_id){
+        require(msg.sender == Tests[_eastate_id].owner);
+        require(Tests[ _eastate_id].presentStatus == false);
+        require(Tests[ _eastate_id].saleStatus == false);
+        _;
+    }
+
+   function create_coun(address _owner, string memory _info, uint _sq) public{
+    require(msg.sender == admin, "No!");
+    Tests[e_l] = Test(_owner, _info, _sq, false, false);
+    e_l = e_l + 1;
+   }
+
+   function create_sale(uint _e_id, uint _price) public isOwner(_e_id){
+       address payable[] memory customers;
+       uint[] memory prices;
+       sale[s_length] = Sale(_e_id, msg.sender, _price, customers, prices, true);
+       estates[_e_id].sale_status = true;
+   }
+
+
+    function create_present(uint _id, address _adr_to) public isOwner(_id){
+        presents[p_lenght] = Present(_id, msg.sender, _adr_to, true);
+        p_lenght = p_lenght + 1;
+        estates[_id].presents_status = true;
+    }
+    function stop_present(uint _p_id) public{
+        require(presents[_p_id].status == true, "Already not presented");
+        require(presents[_p_id].adr_to == msg.sender, "Not for you")
+        uint e_id = presents[_p_id].estate_id;
+        presents[_p_id].status = false;
+        estates[e_id].present_status = false
+    }
+}
+
